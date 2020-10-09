@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import args from 'args';
-import DataRepository from './internals/DataRepository';
+import DataRepository from './db/DataRepository';
 
 const flags = args
   .option('store', 'data store name', 'iau')

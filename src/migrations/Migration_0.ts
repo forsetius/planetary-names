@@ -1,18 +1,14 @@
 import Sqlite from 'better-sqlite3';
-import MigrationInterface from './MigrationInterface';
+import MigrationInterface from '../db/MigrationInterface';
 
 export default class Migration_0 implements MigrationInterface {
-  public getVersion(): number
-  {
-    return 0;
-  }
-
-  public getDescrition(): string
+  public getDescription(): string
   {
     return 'Database initialization';
   }
 
-  public up(db: Sqlite.Database): void {
+  public up(db: Sqlite.Database): void
+  {
     const sql = `
     CREATE TABLE targets (
       id INTEGER PRIMARY KEY,
@@ -61,11 +57,6 @@ export default class Migration_0 implements MigrationInterface {
       changed_to TEXT,
 
       FOREIGN KEY (feature_id) REFERENCES features (id)
-    );
-
-    CREATE TABLE WITHOUT ROWID migrations (
-      id INTEGER PRIMARY KEY,
-      version TEXT
     );
 
     CREATE INDEX target_idx ON features(target);
@@ -169,7 +160,8 @@ export default class Migration_0 implements MigrationInterface {
     db.exec(sql);
   }
 
-  public down(db: Sqlite.Database): void {
+  public down(db: Sqlite.Database): void
+  {
     const sql = `
       DROP TABLE logs IF EXISTS;
       DROP TABLE features IF EXISTS;

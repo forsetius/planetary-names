@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import args from 'args';
+import DataRepository from './db/DataRepository';
 
 const flags = args
   .option('store', 'data store name', 'iau')
@@ -10,7 +11,9 @@ if (flags.help) {
 }
 
 async function main() {
+  const store = new DataRepository(flags.store);
 
+  store.close();
 }
 
 main();

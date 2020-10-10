@@ -1,7 +1,7 @@
 import Sqlite from 'better-sqlite3';
 import MigrationInterface from '../db/MigrationInterface';
 
-export default class Migration_0 implements MigrationInterface {
+export default class Migration_1 implements MigrationInterface {
   public getDescription(): string
   {
     return 'Database initialization';
@@ -11,16 +11,16 @@ export default class Migration_0 implements MigrationInterface {
   {
     const sql = `
     CREATE TABLE targets (
-      id INTEGER PRIMARY KEY,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT
     );
 
     CREATE TABLE feature_types (
       code TEXT PRIMARY KEY,
       name TEXT
-    );
+    ) WITHOUT ROWID;
 
-    CREATE TABLE WITHOUT ROWID features (
+    CREATE TABLE features (
       id INTEGER PRIMARY KEY,
       name TEXT,
       clean_name TEXT,
@@ -45,13 +45,12 @@ export default class Migration_0 implements MigrationInterface {
       created_at TEXT DEFAULT (datetime('now')),
       updated_at TEXT DEFAULT (datetime('now')),
 
-      FOREIGN KEY (target) REFERENCES targets (rowid),
+      FOREIGN KEY (target) REFERENCES targets (id),
       FOREIGN KEY (feature_type) REFERENCES feature_types (code)
-    );
+    ) WITHOUT ROWID;
 
     CREATE TABLE logs (
-      id INTEGER PRIMARY KEY,
-      at TEXT DEFAULT NOW(),
+      at TEXT,
       feature_id INTEGER,
       changed_from TEXT,
       changed_to TEXT,

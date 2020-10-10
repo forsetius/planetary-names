@@ -16,10 +16,10 @@ export default class Migrator {
 
       if (migrationTableExists === 0) {
         this.db.exec(`
-          CREATE TABLE WITHOUT ROWID migrations (
+          CREATE TABLE migrations (
             version INTEGER PRIMARY KEY,
             description TEXT
-          );
+          ) WITHOUT ROWID;
         `)
       }
   }
@@ -28,7 +28,7 @@ export default class Migrator {
   {
     const currentVersion = this.getCurrentVersion();
 
-    for (const filename of glob(Migrator.MIGRATIONS_DIR + 'Migration_*.?s')) {
+    for (const filename of glob(Migrator.MIGRATIONS_DIR + 'Migration_*.js')) {
       let versionStr = path.basename(filename);
       versionStr = versionStr.slice(10, versionStr.indexOf('.'));
       const version = parseInt(versionStr);
@@ -36,14 +36,14 @@ export default class Migrator {
         throw new InvalidMigrationError('Invalid migration version: ' + versionStr);
       }
 
-      if (currentVersion > version) {
+      if (currentVersion < version) {
         const migrationFile = require(filename) as Default<Ctor<MigrationInterface>>;
         const migration = new migrationFile.default();
         migration.up(this.db);
 
         this.db.exec(`
           INSERT INTO migrations (version, description)
-            VALUES (${version}, ${migration.getDescription()});
+            VALUES (${version}, '${migration.getDescription()}');
         `);
       }
     }
@@ -52,10 +52,10 @@ export default class Migrator {
   public getCurrentVersion(): number
   {
     const version = this.db
-      .prepare( `SELECT version FROM migrations';` )
+      .prepare( `SELECT MAX(version) FROM migrations;` )
       .pluck()
       .get() as number;
 
-    return version;
+    return version ?? 0;
   }
 }
